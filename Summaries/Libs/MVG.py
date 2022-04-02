@@ -1,4 +1,3 @@
-import numpy as np
 def logpdf_GAU_ND_1sample(x,mu,C):
     """This function computes the Gaussian probability density for a given sample x.
         M: number of features
@@ -37,3 +36,20 @@ def logpdf_GAU_ND(x,mu,C):
         density_xi = logpdf_GAU_ND_1sample(x[:,i:i+1],mu,C)
         y[i] = density_xi
     return y
+
+def loglikelihood(X):
+    """This function computes the loglikelihood function value
+        mu_ML: mean  | numpy array of shape (M, 1)
+        C_ML: covariance matrix | numpy array of shape (M,M)
+        Parameters
+        ----------
+        X: matrix of samples | numpy array of shape (M, N) 
+        Returns
+        -------
+        loglikelihood
+        """
+    N = X.shape[1]
+    mu_ML = np.mean(X, axis=1).reshape(-1,1)
+    Xc = X - mu_ML
+    C_ML = 1/N * np.dot(Xc,Xc.T) # covariance matrix
+    return sum(logpdf_GAU_ND(X,mu_ML,C_ML))
