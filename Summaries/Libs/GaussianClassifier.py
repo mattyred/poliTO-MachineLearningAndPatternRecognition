@@ -89,7 +89,7 @@ def compute_post_probabilities(DTE, LTE, mu_classes, cov_classes):
         SPost[c,:] = SPost_c
     return SPost
 
-def compute_post_probabilities_log(DTE, LTE, mu_classes, cov_classes):
+def compute_post_probabilities_logmethod(DTE, LTE, mu_classes, cov_classes):
     ############ EQUIVALENT TO compute_post_probabilities ###############
     S = np.zeros(shape=(LTE.shape[0],DTE.shape[1]))
     for i in range(DTE.shape[1]):
@@ -114,7 +114,7 @@ def compute_post_probabilities_log(DTE, LTE, mu_classes, cov_classes):
     logSMarginal = scipy.special.logsumexp(logSJoint, axis=0).reshape(1,-1)
     log_SPost = logSJoint - logSMarginal  
     SPost_ = np.exp(log_SPost)
-    return SPost
+    return SPost_
 
 def predict_labels(SPost ,LTE):
         """ Find predicted class labels. Each sample is assigned to the class for which it has the highest probability in the matrix SPost
