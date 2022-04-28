@@ -118,6 +118,31 @@ def compute_post_probabilities_logmethod(DTE, LTE, mu_classes, cov_classes):
     SPost_ = np.exp(log_SPost)
     return SPost_
 
+def compute_post_probabilities_tied(DTE, LTE, mu_classes, tied_cov):
+    num_classes = len(set(LTE))
+    num_test_samples = DTE.shape[1]
+    S = np.zeros(shape=(num_classes,num_test_samples))
+    for i in range(num_test_samples):
+        xt = DTE[:,i:i+1] # test sample xt
+        # now compute the probability density related to each class label for the sample xt
+        score = np.zeros(shape=(num_classes,1))
+        for j in set(LTE):
+            mu = mu_classes[j]
+            C = tied_cov
+            score[j,:] = np.exp(logpdf_GAU_ND_1sample(xt,mu,C))
+        S[:,i:i+1] = score
+        
+    prior_prob = 1 / num_test_samples
+    SJoint = S * prior_prob
+    SMarginal = SJoint.sum(0).reshape(-1,1)
+    # compute class posterior probabilities SPost = SJoint / SMarginal
+    SPost = np.zeros((num_classes,num_test_samples))
+    for c in range(num_classes):
+        SJoint_c = SJoint[c,:].reshape(-1,1)
+        SPost_c = (SJoint_c / SMarginal).reshape(1,-1)
+        SPost[c,:] = SPost_c
+    return SPost
+
 def predict_labels(SPost ,LTE):
         """ Find predicted class labels. Each sample is assigned to the class for which it has the highest probability in the matrix SPost
         Parameters
